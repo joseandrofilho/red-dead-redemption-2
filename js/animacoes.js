@@ -4,8 +4,8 @@
    iniciarAnimacoes(), no final do arquivo.
    ========================================================= */
 
-// Elementos que recebem o efeito de "cortina" (imagem revelada de baixo para cima)
-const IMAGENS_REVELADAS = ".historia__main, .historia__strip figure, .mundo__item, .destaque";
+// Imagens que recebem o zoom suave ligado ao scroll
+const IMAGENS_COM_ZOOM = ".historia__main, .historia__strip figure, .mundo__item, .destaque";
 
 // Textos que sobem suavemente ao entrar na tela
 const TEXTOS_REVELADOS = ".section .eyebrow, .interlude .eyebrow, .historia__text p:not(.eyebrow), .section__lead";
@@ -60,8 +60,8 @@ function carregarPagina() {
 
   // Sempre termina em 100% antes de abrir a página
   return Promise.race([tudoPronto, limite]).then(() => {
-    atualizarContador(100, 0.4);
-    return new Promise((ok) => setTimeout(ok, 450));
+    atualizarContador(100, 0.25);
+    return new Promise((ok) => setTimeout(ok, 300));
   });
 }
 
@@ -73,9 +73,9 @@ function sairDoPreloader() {
     onComplete: () => document.getElementById("preloader").remove(),
   })
     .to(".preloader__logo, .preloader__barra, .preloader__pct", {
-      autoAlpha: 0, y: -20, duration: 0.5, stagger: 0.05, ease: "power2.in",
+      autoAlpha: 0, y: -20, duration: 0.3, stagger: 0.04, ease: "power2.in",
     })
-    .to("#preloader", { yPercent: -100, duration: 1.1, ease: "expo.inOut" }, "-=0.1")
+    .to("#preloader", { yPercent: -100, duration: 0.8, ease: "expo.inOut" }, "-=0.1")
     .add(() => document.documentElement.classList.remove("is-loading"), "<");
 }
 
@@ -184,24 +184,18 @@ function animarTextos() {
 }
 
 /* ---------------------------------------------------------
-   IMAGENS: cortina de baixo para cima + zoom saindo
+   IMAGENS: sempre visíveis; só um zoom suave saindo
+   conforme a imagem atravessa a tela (nada fica escondido)
    --------------------------------------------------------- */
 function animarImagens() {
-  document.querySelectorAll(IMAGENS_REVELADAS).forEach((bloco) => {
-    const img = bloco.querySelector("img");
-    // Itens lado a lado entram em sequência
-    const atraso = ([...bloco.parentElement.children].indexOf(bloco) % 3) * 0.08;
-
-    gsap.set(bloco, { clipPath: "inset(100% 0% 0% 0%)" });
-    gsap.set(img, { scale: 1.15, transition: "none" });
-
-    gsap.timeline({
-      scrollTrigger: { trigger: bloco, start: "top bottom", once: true },
-      // devolve o controle ao CSS para o zoom do hover funcionar
-      onComplete: () => gsap.set(img, { clearProps: "transform,transition" }),
-    })
-      .to(bloco, { clipPath: "inset(0% 0% 0% 0%)", duration: 0.9, ease: "power3.out" }, atraso)
-      .to(img, { scale: 1, duration: 1.2, ease: "power3.out" }, atraso);
+  document.querySelectorAll(IMAGENS_COM_ZOOM).forEach((bloco) => {
+    gsap.fromTo(bloco.querySelector("img"),
+      { scale: 1.15 },
+      {
+        scale: 1,
+        ease: "none",
+        scrollTrigger: { trigger: bloco, start: "top bottom", end: "bottom center", scrub: true },
+      });
   });
 }
 
@@ -225,9 +219,9 @@ function animarGaleria() {
   gsap.set(".galeria__card", { autoAlpha: 0, y: 40 });
 
   ScrollTrigger.batch(".galeria__card", {
-    start: "top bottom",
+    start: "top bottom+=150", // começa antes de entrar na tela: chega pronto
     once: true,
-    onEnter: (lote) => gsap.to(lote, { autoAlpha: 1, y: 0, duration: 0.7, stagger: 0.05, ease: "power3.out" }),
+    onEnter: (lote) => gsap.to(lote, { autoAlpha: 1, y: 0, duration: 0.5, stagger: 0.04, ease: "power3.out" }),
   });
 }
 
@@ -280,7 +274,7 @@ function iniciarAnimacoes() {
     animarFooter();
 
     sairDoPreloader();
-    animarHero(0.7); // começa enquanto a cortina do preloader sobe
+    animarHero(0.45); // começa enquanto a cortina do preloader sobe
   });
 }
 

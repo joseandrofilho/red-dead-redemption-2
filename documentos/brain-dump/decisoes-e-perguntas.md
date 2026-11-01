@@ -44,7 +44,8 @@ Regra de nomes: tudo em minúsculas, sem acentos e com hífen no lugar de espaç
   - Intro do hero: letras do título sobem de uma máscara, vídeo faz zoom saindo, nav e textos entram em sequência
   - Scroll suave (ScrollSmoother) e barra de progresso vermelha no topo
   - Nav some ao rolar para baixo e volta ao rolar para cima
-  - Títulos revelados linha a linha; imagens abrem como cortina, com zoom saindo
+  - Títulos revelados linha a linha; imagens sempre visíveis, só com um zoom suave ligado ao scroll
+    (a antiga "cortina" escondia as imagens e parecia que estavam carregando)
   - Parallax no hero e no pôr do sol do interlúdio
   - Frase do footer "acende" palavra por palavra conforme o scroll
 - **Acessibilidade e segurança**: com `prefers-reduced-motion` ativo, ou se o CDN do GSAP falhar, nada é animado e a página aparece estática e completa.
