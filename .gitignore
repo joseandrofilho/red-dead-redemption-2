@@ -1,0 +1,7 @@
+# Backups e arquivos que saíram do site
+_nao-usado/
+
+# Sistema
+.DS_Store
+Thumbs.db
+desktop.ini
